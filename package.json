@@ -1,0 +1,25 @@
+{
+  "name": "3d-model-viewerr",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.112.0",
+    "@react-three/fiber": "^8.17.7",
+    "http-proxy-middleware": "^3.0.2",
+    "next": "14.2.11",
+    "react": "^18",
+    "react-dom": "^18",
+    "three": "^0.168.0"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "14.2.11",
+    "file-loader": "^6.2.0"
+  }
+}
