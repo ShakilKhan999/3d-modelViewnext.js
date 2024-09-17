@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div>
       <h1>3D Model Viewer</h1>
-      <ModelViewer modelUrl={modelUrl} />
+      <ModelViewer modelUrl={modelUrl} scale={2} />
     </div>
   )
 }
