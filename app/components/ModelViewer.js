@@ -1,10 +1,32 @@
 'use client'
 
-import React, { useRef, Suspense, useState } from 'react'
+import React, { useRef, Suspense, useState, Component } from 'react'
 import { Canvas, useLoader, useFrame } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls } from '@react-three/drei'
-import { ErrorBoundary } from 'react-error-boundary'
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.log('Error caught by ErrorBoundary:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback
+    }
+
+    return this.props.children
+  }
+}
 
 const Model = ({ url }) => {
   const [error, setError] = useState(null)
