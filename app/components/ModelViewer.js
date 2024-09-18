@@ -8,11 +8,11 @@ import { OrbitControls } from '@react-three/drei'
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false }
+    this.state = { hasError: false, errorMessage: '' }
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true }
+    return { hasError: true, errorMessage: error.message }
   }
 
   componentDidCatch(error, errorInfo) {
@@ -21,7 +21,7 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback
+      return <div>Error loading 3D model: {this.state.errorMessage}</div>
     }
 
     return this.props.children
@@ -33,7 +33,7 @@ const Model = ({ url, scale = 3, onError }) => {
   const gltf = useLoader(GLTFLoader, url, undefined, (error) => {
     console.error('Error loading model:', error);
     setError(error);
-    // onError(error);
+    if (onError) onError(error);
   });
   const modelRef = useRef();
 
@@ -51,17 +51,35 @@ const Model = ({ url, scale = 3, onError }) => {
 };
 
 const ModelViewer = ({ modelUrl, scale = 3 }) => {
-  const proxyUrl = `/api/proxy${new URL(modelUrl).pathname}${new URL(modelUrl).search}`
+  const [error, setError] = useState(null);
+
+  // Function to determine if a string is a valid URL
+  const isValidUrl = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // If modelUrl is already a valid URL, use it directly
+  // Otherwise, assume it's a path and prepend the base URL
+  const fullUrl = isValidUrl(modelUrl) ? modelUrl : `${window.location.origin}${modelUrl}`;
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div style={{ width: '100%', height: '600px' }}>
-      <ErrorBoundary fallback={<div>Error loading 3D model</div>}>
+      <ErrorBoundary>
         <Canvas camera={{ position: [0, 0, 5] }}>
           <ambientLight intensity={0.5} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
           <pointLight position={[-10, -10, -10]} />
           <Suspense fallback={<mesh><boxGeometry args={[1, 1, 1]} /><meshStandardMaterial color="blue" /></mesh>}>
-            <Model url={proxyUrl} scale={scale} />
+            <Model url={fullUrl} scale={scale} onError={setError} />
           </Suspense>
           <OrbitControls />
         </Canvas>

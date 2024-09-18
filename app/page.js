@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 
-const ModelViewer = dynamic(() => import('../../components/ModelViewer'), { ssr: false })
+const ModelViewer = dynamic(() => import('./components/ModelViewer'), {
+  ssr: false,
+  loading: () => <p>Loading 3D viewer...</p>
+})
 
 const API_KEY = 'msy_FhJBg9tEAYWGzU2FGZVwJ66OGO7WLF9mKVGM';
 
@@ -17,11 +20,6 @@ async function makeApiCall(url, options) {
   return response.json();
 }
 
-function getProxiedUrl(originalUrl) {
-  const url = new URL(originalUrl);
-  return `/api/proxy${url.pathname}${url.search}`;
-}
-
 export default function Home() {
   const [modelUrl, setModelUrl] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -31,7 +29,7 @@ export default function Home() {
 
   useEffect(() => {
     async function generateAndPollModel() {
-      if (postRequestMade.current) return; // Skip if POST request was already made
+      if (postRequestMade.current) return;
       postRequestMade.current = true;
 
       try {
@@ -72,9 +70,7 @@ export default function Home() {
             console.log('Model generation complete');
             const originalUrl = getResult.model_urls.glb;
             console.log('Original GLB URL:', originalUrl);
-            const proxiedUrl = getProxiedUrl(originalUrl);
-            console.log('Proxied GLB URL:', proxiedUrl);
-            setModelUrl(proxiedUrl);
+            setModelUrl(originalUrl);
             setIsLoading(false);
             break; // Exit the loop when the model is ready
           }
@@ -88,22 +84,6 @@ export default function Home() {
 
     generateAndPollModel();
   }, []);
-
-  useEffect(() => {
-    if (modelUrl) {
-      console.log('Attempting to load model from URL:', modelUrl);
-      // You could add a test fetch here to verify the URL is accessible
-      fetch(modelUrl)
-        .then(response => {
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-          console.log('Model URL is accessible');
-        })
-        .catch(error => {
-          console.error('Error accessing model URL:', error);
-          setError(`Failed to access model URL: ${error.message}`);
-        });
-    }
-  }, [modelUrl]);
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
