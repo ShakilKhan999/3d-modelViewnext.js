@@ -8,7 +8,7 @@ const ModelViewer = dynamic(() => import('./components/ModelViewer'), {
   loading: () => <p>Loading 3D viewer...</p>
 })
 
-const API_KEY = 'msy_FhJBg9tEAYWGzU2FGZVwJ66OGO7WLF9mKVGM';
+const API_KEY = 'msy_5wFEvF64qc9zCLYY9vbTnfP5QZgAhtAjQIS8';
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
